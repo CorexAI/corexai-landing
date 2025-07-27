@@ -1,103 +1,73 @@
 import Image from "next/image";
+import AnimatedSections from "./AnimatedSections";
+
+export const metadata = {
+  title: "Corex AI – Viral Script Generator",
+  description: "AI That Writes Viral Scripts.",
+  openGraph: {
+    title: "Corex AI – Viral Script Generator",
+    description: "AI That Writes Viral Scripts.",
+    url: "https://corexai.app",
+    siteName: "Corex AI",
+    images: [
+      {
+        url: "/og web final.png",
+        width: 1200,
+        height: 630,
+        alt: "Corex AI – Viral Script Generator",
+      },
+    ],
+    type: "website",
+  },
+};
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <div className="flex flex-col items-center w-full min-h-screen bg-black text-white">
+      {/* Hero Section (static) */}
+      <section
+        className="w-full flex flex-col md:flex-row justify-between pt-12 md:pt-24 pb-16 px-4 md:px-40 relative overflow-hidden"
+      >
+        <div className="flex flex-col flex-1">
+          <h1 className="text-6xl md:text-8xl font-extrabold mb-4 text-white drop-shadow-lg text-left">
+            Stop Guessing.<br />Start Trending.
+          </h1>
+          <p className="text-lg md:text-2xl text-gray-300 mb-8 mt-[18px] font-medium">
+            AI That Writes Viral Scripts.
+          </p>
+          <div className="flex gap-4 mb-12 mt-4 flex-wrap justify-start">
+            <button className="bg-gray-800 text-gray-500 cursor-not-allowed rounded-lg px-6 py-3 font-semibold text-lg shadow-md opacity-60" disabled>
+              App Store (Coming Soon)
+            </button>
+            <button className="bg-gray-800 text-gray-500 cursor-not-allowed rounded-lg px-6 py-3 font-semibold text-lg shadow-md opacity-60" disabled>
+              Play Store (Coming Soon)
+            </button>
+          </div>
+          <div className="flex md:hidden justify-center items-center mt-6">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src="/mockup1 web.png"
+              alt="Corex AI mobile app interface showing viral script generation features"
+              width={480}
+              height={480}
+              className="object-contain relative drop-shadow-[0_0_36px_rgba(0,52,184,0.6)] w-[480px] h-[480px]"
+              priority
+              quality={85}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <div className="hidden md:flex flex-shrink-0 ml-0 md:ml-[8px] -mt-16 md:relative justify-center items-center">
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src="/mockup1 web.png"
+            alt="Corex AI mobile app interface showing viral script generation features"
+            width={550}
+            height={550}
+            className="object-contain relative drop-shadow-[0_0_36px_rgba(0,52,184,0.6)]"
+            priority
+            quality={85}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </section>
+      <AnimatedSections />
     </div>
   );
 }

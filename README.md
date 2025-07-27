@@ -34,3 +34,32 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Updating Content
+
+- **Testimonials:** Edit the testimonials section in `src/app/page.tsx`.
+- **Pricing/Subscription:** Update the pricing details and PayPal integration in `src/app/pricing/page.tsx`.
+- **App Store/Play Store Links:** Update the button links in the hero section of `src/app/page.tsx` when your app is live.
+- **Social Media Links:** Update the social icons section in `src/app/page.tsx` with your actual URLs.
+- **Logo:** Replace `/public/next.svg` with your logo file and update the `src/app/layout.tsx` if needed.
+
+## Connecting Your Domain (corexai.app) on Vercel
+
+1. Deploy your site to Vercel (https://vercel.com/).
+2. In your Vercel dashboard, go to your project settings > Domains.
+3. Add `corexai.app` as a custom domain.
+4. Follow Vercel's instructions to update your DNS records (usually at your domain registrar).
+5. Once DNS propagates, your site will be live at `https://corexai.app`.
+
+## Project Structure Overview
+
+- `src/app/layout.tsx`: Global layout, navbar, and footer.
+- `src/app/page.tsx`: Home page (hero, features, testimonials, social icons).
+- `src/app/pricing/page.tsx`: Pricing and payment form.
+- `src/app/terms/page.tsx`: Terms of Service.
+- `src/app/privacy/page.tsx`: Privacy Policy.
+- `public/`: Static assets (logo, icons, etc.).
+
+---
+
+For further customization, edit the respective files in the `src/app/` directory. If you need help, just ask!
