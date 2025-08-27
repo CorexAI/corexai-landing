@@ -103,7 +103,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className="w-full flex flex-col items-center justify-center min-h-screen px-4 md:px-8 relative z-10 -mt-64 md:mt-0 pt-64 md:pt-0 -mb-24 md:mb-0">
+      <section className="w-full flex flex-col items-center justify-center min-h-screen px-4 md:px-8 relative z-10 mt-0 md:mt-0 pt-0 md:pt-0 mb-0 md:mb-0">
         <div className="text-center max-w-5xl mx-auto">
           {/* Main Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black mb-6 md:mb-8 leading-tight" style={{ fontFamily: 'var(--font-geist-sans)' }}>

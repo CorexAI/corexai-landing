@@ -14,7 +14,7 @@ export default function AnimatedSections() {
     <>
       {/* Features Section (animated) */}
       <motion.section
-        className="w-full max-w-6xl md:max-w-5xl lg:max-w-7xl mx-auto px-2 md:px-4 mt-4 md:mt-20 relative pt-6 md:pt-12 pb-12 md:pb-16"
+        className="w-full max-w-6xl md:max-w-5xl lg:max-w-7xl mx-auto px-2 md:px-4 mt-20 md:mt-20 relative pt-6 md:pt-12 pb-12 md:pb-16"
       >
         {/* Premium Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/15 via-transparent to-purple-600/15 rounded-3xl blur-3xl"></div>
@@ -123,7 +123,7 @@ export default function AnimatedSections() {
                 </div>
                 <div className="flex-1 text-center md:text-left">
                   <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent mb-3 md:mb-4">Viral Scripts</h3>
-                  <p className="text-gray-300 text-base md:text-lg lg:text-xl leading-relaxed font-light">Scene-by-scene voice lines built for retention, pacing, and payoff—ready to record.</p>
+                  <p className="text-gray-300 text-base md:text-lg lg:text-xl leading-relaxed font-light">Scripts structured to grip attention, flow seamlessly, and drive viewers straight to the climax—ready to use.</p>
                 </div>
               </div>
             </div>
