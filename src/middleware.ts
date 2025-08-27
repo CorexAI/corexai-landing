@@ -27,7 +27,7 @@ export function middleware(request: NextRequest) {
   // Only protect API routes
   if (pathname.startsWith('/api/')) {
     // Skip authentication for non-protected routes
-    if (pathname.startsWith('/api/auth/')) {
+    if (pathname.startsWith('/api/auth/') || pathname.startsWith('/api/test-firebase-admin')) {
       return NextResponse.next();
     }
 
