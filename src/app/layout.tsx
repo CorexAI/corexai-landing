@@ -34,7 +34,7 @@ export default function RootLayout({
       <head>
         {/* Essential Meta Tags */}
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <meta name="theme-color" content="#000000" />
         
         {/* SEO Meta Tags */}
