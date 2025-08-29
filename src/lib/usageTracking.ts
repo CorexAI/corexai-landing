@@ -18,6 +18,39 @@ export const getUsageLimits = (plan: string): UsageLimits => {
   };
 };
 
+// Helper to safely parse dates from Firebase
+const parseFirebaseDate = (dateValue: any): Date | null => {
+  if (!dateValue) return null;
+  
+  try {
+    // Handle Firestore Timestamp objects
+    if (dateValue && typeof dateValue.toDate === 'function') {
+      return dateValue.toDate();
+    }
+    
+    // Handle string dates
+    if (typeof dateValue === 'string') {
+      return new Date(dateValue);
+    }
+    
+    // Handle Date objects
+    if (dateValue instanceof Date) {
+      return dateValue;
+    }
+    
+    // Handle timestamp numbers
+    if (typeof dateValue === 'number') {
+      return new Date(dateValue);
+    }
+    
+    console.warn('Unknown date format:', dateValue);
+    return null;
+  } catch (error) {
+    console.error('Error parsing date:', error, 'Value:', dateValue);
+    return null;
+  }
+};
+
 // Get user's timezone-adjusted date
 const getUserLocalDate = (userData: any): Date => {
   const userTimezone = userData.timezone || 'UTC';
@@ -54,10 +87,10 @@ export const getDaysUntilReset = (userData: any): number => {
     
     try {
       const now = getUserLocalDate(userData);
-      const lastReset = new Date(userData.lastReset);
+      const lastReset = parseFirebaseDate(userData.lastReset);
       
       // Validate the date
-      if (isNaN(lastReset.getTime())) {
+      if (!lastReset || isNaN(lastReset.getTime())) {
         console.warn('Invalid lastReset date, resetting to now');
         return 7;
       }
@@ -75,7 +108,7 @@ export const getDaysUntilReset = (userData: any): number => {
       console.log('🔍 RESET CALCULATION DEBUG:');
       console.log('🔍 User timezone:', userData.timezone);
       console.log('🔍 Original lastReset:', userData.lastReset);
-      console.log('🔍 lastReset (UTC):', lastReset.toISOString());
+      console.log('🔍 lastReset (parsed):', lastReset.toISOString());
       console.log('🔍 lastReset (User TZ):', lastResetInUserTz.toISOString());
       console.log('🔍 Now (User TZ):', now.toISOString());
       console.log('🔍 Next reset (User TZ):', nextReset.toISOString());
@@ -92,10 +125,10 @@ export const getDaysUntilReset = (userData: any): number => {
     
     try {
       const now = getUserLocalDate(userData);
-      const nextRenewal = new Date(userData.nextRenewalDate);
+      const nextRenewal = parseFirebaseDate(userData.nextRenewalDate);
       
       // Validate the date
-      if (isNaN(nextRenewal.getTime())) {
+      if (!nextRenewal || isNaN(nextRenewal.getTime())) {
         console.warn('Invalid nextRenewalDate, using default 0 days');
         return 0;
       }
