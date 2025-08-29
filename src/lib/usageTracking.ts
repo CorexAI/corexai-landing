@@ -33,6 +33,12 @@ const getUserLocalDate = (userData: any): Date => {
   }
 };
 
+// Helper to convert a UTC date to a date in the user's timezone
+const convertToUserTimezone = (utcDate: Date, userData: any): Date => {
+  const userTimezone = userData.timezone || 'UTC';
+  return new Date(utcDate.toLocaleString('en-US', { timeZone: userTimezone }));
+};
+
 // Calculate days until next reset/renewal
 export const getDaysUntilReset = (userData: any): number => {
   if (!userData) return 0;
@@ -56,11 +62,25 @@ export const getDaysUntilReset = (userData: any): number => {
         return 7;
       }
       
+      // Convert lastReset to user's timezone for accurate calculation
+      const lastResetInUserTz = convertToUserTimezone(lastReset, userData);
+      
       const resetPeriodMs = 7 * 24 * 60 * 60 * 1000;
-      const nextReset = new Date(lastReset.getTime() + resetPeriodMs);
+      const nextReset = new Date(lastResetInUserTz.getTime() + resetPeriodMs);
       
       const diffTime = nextReset.getTime() - now.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // Debug logging
+      console.log('🔍 RESET CALCULATION DEBUG:');
+      console.log('🔍 User timezone:', userData.timezone);
+      console.log('🔍 Original lastReset:', userData.lastReset);
+      console.log('🔍 lastReset (UTC):', lastReset.toISOString());
+      console.log('🔍 lastReset (User TZ):', lastResetInUserTz.toISOString());
+      console.log('🔍 Now (User TZ):', now.toISOString());
+      console.log('🔍 Next reset (User TZ):', nextReset.toISOString());
+      console.log('🔍 Days until reset:', diffDays);
+      
       return Math.max(0, diffDays);
     } catch (error) {
       console.error('Error calculating reset days:', error);
@@ -80,7 +100,10 @@ export const getDaysUntilReset = (userData: any): number => {
         return 0;
       }
       
-      const diffTime = nextRenewal.getTime() - now.getTime();
+      // Convert nextRenewal to user's timezone for accurate calculation
+      const nextRenewalInUserTz = convertToUserTimezone(nextRenewal, userData);
+      
+      const diffTime = nextRenewalInUserTz.getTime() - now.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return Math.max(0, diffDays);
     } catch (error) {
