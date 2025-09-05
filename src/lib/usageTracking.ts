@@ -114,7 +114,20 @@ export const getDaysUntilReset = (userData: any): number => {
       console.log('🔍 Next reset (User TZ):', nextReset.toISOString());
       console.log('🔍 Days until reset:', diffDays);
       
-      return Math.max(0, diffDays);
+      // If reset time has passed (diffDays <= 0), trigger immediate reset
+      if (diffDays <= 0) {
+        console.log('🔄 Reset time has passed, triggering immediate reset...');
+        // Trigger reset by dispatching an event that UserContext will catch
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('triggerUsageReset', { 
+            detail: { uid: userData.uid || 'unknown' } 
+          }));
+        }
+        // Return 7 days as the reset should happen immediately
+        return 7;
+      }
+      
+      return diffDays;
     } catch (error) {
       console.error('Error calculating reset days:', error);
       return 7; // Fallback to 7 days

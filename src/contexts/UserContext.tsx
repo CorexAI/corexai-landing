@@ -52,6 +52,8 @@ interface AuthContextType {
   sendVerificationEmail: () => Promise<void>;
   updateUserData: (data: Partial<UserData>) => Promise<void>;
   refreshUserData: () => Promise<void>;
+  exportUserData: () => Promise<any>;
+  deleteAccount: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -112,6 +114,47 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     return unsubscribe;
   }, []);
+
+  // Listen for immediate usage reset triggers
+  useEffect(() => {
+    if (!user) return;
+
+    const handleUsageReset = async (event: CustomEvent) => {
+      const { uid } = event.detail;
+      if (uid === user.uid) {
+        console.log('🔄 UserContext - Received immediate usage reset trigger');
+        try {
+          // Perform immediate reset
+          const now = new Date();
+          await updateDoc(doc(db, 'users', user.uid), {
+            hooksGenerated: 0,
+            scriptsGenerated: 0,
+            lastReset: now,
+            lastResetTimestamp: now.getTime(),
+            resetReason: 'immediate_reset_trigger'
+          });
+          
+          // Update local state
+          setUserData(prev => prev ? {
+            ...prev,
+            hooksGenerated: 0,
+            scriptsGenerated: 0,
+            lastReset: now
+          } : null);
+          
+          console.log('✅ UserContext - Immediate usage reset completed');
+        } catch (error) {
+          console.error('❌ UserContext - Error during immediate reset:', error);
+        }
+      }
+    };
+
+    window.addEventListener('triggerUsageReset', handleUsageReset as EventListener);
+    
+    return () => {
+      window.removeEventListener('triggerUsageReset', handleUsageReset as EventListener);
+    };
+  }, [user]);
 
   const signUp = async (email: string, password: string, name: string) => {
     if (!auth || !db) throw new Error('Firebase not initialized');
@@ -279,6 +322,70 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Export user data before account deletion
+  const exportUserData = async () => {
+    if (!user) throw new Error('No user logged in');
+    
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch('/api/export-user-data', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to export user data');
+      }
+
+      const result = await response.json();
+      return result.data;
+    } catch (error: any) {
+      console.error('Error exporting user data:', error);
+      throw new Error(error.message || 'Failed to export user data');
+    }
+  };
+
+  // Delete user account completely
+  const deleteAccount = async (password: string) => {
+    if (!user) throw new Error('No user logged in');
+    
+    try {
+      // Reauthenticate user with password
+      const credential = EmailAuthProvider.credential(user.email!, password);
+      await reauthenticateWithCredential(user, credential);
+      
+      // Get fresh ID token after reauthentication
+      const idToken = await user.getIdToken(true);
+      
+      // Call delete account API
+      const response = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete account');
+      }
+
+      // Clear local state
+      setUser(null);
+      setUserData(null);
+      
+      console.log('✅ Account deleted successfully');
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      throw new Error(error.message || 'Failed to delete account');
+    }
+  };
+
   const value = {
     user,
     userData,
@@ -289,7 +396,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     resetPassword,
     sendVerificationEmail,
     updateUserData,
-    refreshUserData
+    refreshUserData,
+    exportUserData,
+    deleteAccount
   };
 
   return (

@@ -331,7 +331,7 @@ export default function HookGeneratorPage() {
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     placeholder="Describe your content idea... What story, tip, or insight do you want to share?"
-                    className="relative w-full h-36 px-6 py-5 bg-gray-900/90 border-2 border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 resize-none text-xl leading-relaxed font-medium shadow-2xl shadow-black/20 hover:shadow-2xl hover:shadow-blue-500/10"
+                    className="relative w-full h-36 px-6 py-5 bg-gray-900/90 border-2 border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 resize-none text-base md:text-xl leading-relaxed font-medium shadow-2xl shadow-black/20 hover:shadow-2xl hover:shadow-blue-500/10"
                   />
                 </div>
 
@@ -659,7 +659,7 @@ export default function HookGeneratorPage() {
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/15 via-blue-500/15 to-blue-500/15 rounded-2xl blur-sm pointer-events-none"></div>
                     <div className="relative bg-gray-900/90 border-2 border-gray-700/50 rounded-2xl p-6 text-white shadow-2xl shadow-black/20 hover:shadow-2xl hover:shadow-blue-500/10">
-                      <div className="text-xl font-sans leading-relaxed whitespace-pre-wrap break-words">
+                      <div className="text-base md:text-xl font-sans leading-relaxed whitespace-pre-wrap break-words">
                         {generatedHook}
                       </div>
                     </div>
@@ -673,4 +673,4 @@ export default function HookGeneratorPage() {
       </div>
     </ProtectedRoute>
   );
-}
+} 

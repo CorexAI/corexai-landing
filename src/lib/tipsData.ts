@@ -217,35 +217,44 @@ export const getTipSet = (setId: number): TipSet | null => {
   return TIPS_DATA.find(set => set.setId === setId) || null;
 };
 
-// Get current tip set based on user's last shown date
+// Get current tip set based on calendar days since user started
 export const getCurrentTipSet = (tipsLastShown: Date | null, currentTipSet: number | null): { setId: number; tips: Tip[] } => {
   const now = new Date();
   
-  // If no previous data, start with set 1
+  // If no previous data, start with set 1 (Day 1)
   if (!tipsLastShown || !currentTipSet) {
-    return TIPS_DATA[0];
+    return TIPS_DATA[0]; // Set 1
   }
   
-  // Check if 24 hours have passed since last shown
-  const timeDiff = now.getTime() - tipsLastShown.getTime();
-  const hoursDiff = timeDiff / (1000 * 60 * 60);
+  // Calculate days since the user first started (tipsLastShown is their start date)
+  const startDate = new Date(tipsLastShown);
+  const currentDate = new Date(now);
   
-  // If less than 24 hours, return current set
-  if (hoursDiff < 24) {
+  // Check for invalid dates
+  if (isNaN(startDate.getTime()) || isNaN(currentDate.getTime())) {
+    return TIPS_DATA[0]; // Return Set 1 if invalid dates
+  }
+  
+  // Set both dates to midnight for accurate day calculation
+  startDate.setHours(0, 0, 0, 0);
+  currentDate.setHours(0, 0, 0, 0);
+  
+  const timeDiff = currentDate.getTime() - startDate.getTime();
+  const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+  
+  // Calculate which set to show based on days
+  // Day 0 = Set 1, Day 1 = Set 2, ..., Day 9 = Set 10, Day 10 = Set 1, etc.
+  let targetSetId = (daysDiff % 10) + 1;
+  
+  // If it's the same day, return current set
+  if (daysDiff === 0) {
     const currentSet = getTipSet(currentTipSet);
     return currentSet || TIPS_DATA[0];
   }
   
-  // If 24+ hours passed, move to next set
-  let nextSetId = currentTipSet + 1;
-  
-  // If we've gone past set 10, loop back to set 1
-  if (nextSetId > 10) {
-    nextSetId = 1;
-  }
-  
-  const nextSet = getTipSet(nextSetId);
-  return nextSet || TIPS_DATA[0];
+  // Return the target set for the current day
+  const targetSet = getTipSet(targetSetId);
+  return targetSet || TIPS_DATA[0];
 };
 
 // Get the next tip set (for preview/testing)

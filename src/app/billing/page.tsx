@@ -17,7 +17,7 @@ export default function BillingPage() {
 }
 
 function BillingPageContent() {
-  const { user, userData, loading: userLoading, updateUserData, sendVerificationEmail } = useUser();
+  const { user, userData, loading: userLoading, updateUserData, sendVerificationEmail, exportUserData, deleteAccount } = useUser();
   const router = useRouter();
   const { showSuccess, showError, showWarning, showInfo } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +25,9 @@ function BillingPageContent() {
   const [newEmail, setNewEmail] = useState("");
   const [showSuccessState, setShowSuccessState] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Form states - initialize with real user data
   const [profileData, setProfileData] = useState({
@@ -314,6 +317,59 @@ function BillingPageContent() {
     setTimeout(() => setShowSuccessState(false), 3000);
   };
 
+  // Account deletion functions
+  const handleExportData = async () => {
+    setIsLoading(true);
+    try {
+      const userData = await exportUserData();
+      
+      // Create and download JSON file
+      const dataStr = JSON.stringify(userData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `corexai-user-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      showSuccess('Data Exported', 'Your account data has been downloaded successfully.');
+    } catch (error: any) {
+      console.error('Error exporting data:', error);
+      showError('Export Failed', error.message || 'Failed to export your data. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      showError('Password Required', 'Please enter your password to confirm account deletion.');
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteAccount(deletePassword);
+      showSuccess('Account Deleted', 'Your account has been permanently deleted.');
+      
+      // Redirect to home page after successful deletion
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      showError('Deletion Failed', error.message || 'Failed to delete your account. Please try again.');
+    } finally {
+      setIsDeleting(false);
+      setDeletePassword("");
+      setShowDeleteModal(false);
+    }
+  };
+
   // Show loading state
   if (userLoading) {
     return (
@@ -510,6 +566,47 @@ function BillingPageContent() {
                 </div>
               </motion.div>
 
+              {/* Account Deletion */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="bg-gray-900 rounded-xl p-6 border border-gray-800"
+              >
+                <h2 className="text-xl font-semibold text-white mb-6">Account Deletion</h2>
+                
+                <div className="space-y-6">
+                  {/* Data Export Option */}
+                  <div>
+                    <h3 className="text-lg font-medium text-white mb-3">Export Your Data</h3>
+                    <p className="text-gray-400 mb-4">
+                      Download a copy of your account data including usage statistics, preferences, and settings before deletion.
+                    </p>
+                    <button
+                      onClick={handleExportData}
+                      disabled={isLoading}
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      {isLoading ? "Exporting..." : "Export My Data"}
+                    </button>
+                  </div>
+
+                  {/* Delete Account Section */}
+                  <div className="pt-6 border-t border-gray-700">
+                    <h3 className="text-lg font-medium text-red-400 mb-3">Delete Account</h3>
+                    <p className="text-gray-400 mb-4">
+                      Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                    <button
+                      onClick={() => setShowDeleteModal(true)}
+                      disabled={isLoading}
+                      className="px-6 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                    >
+                      Delete My Account
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
 
             </div>
 
@@ -681,6 +778,64 @@ function BillingPageContent() {
           </div>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-gray-900 border border-red-800/50 rounded-xl p-6 max-w-md w-full"
+          >
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <HiOutlineLockClosed className="w-8 h-8 text-red-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Delete Account</h3>
+              <p className="text-gray-400 text-sm">
+                This action cannot be undone. All your data will be permanently deleted.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Enter your password to confirm
+                </label>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Your password"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-500 transition-colors"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeletePassword("");
+                  }}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting || !deletePassword.trim()}
+                  className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                >
+                  {isDeleting ? "Deleting..." : "Delete Account"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

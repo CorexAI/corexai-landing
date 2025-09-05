@@ -105,23 +105,58 @@ export default function DashboardPage() {
       const tipsLastShown = userData.tipsLastShown ? new Date(userData.tipsLastShown) : null;
       const currentTipSet = userData.currentTipSet || 1;
       
+      // Get the correct tip set based on time
       const { setId, tips } = getCurrentTipSet(tipsLastShown, currentTipSet);
       
+      console.log('🔍 TIPS DEBUG:', {
+        tipsLastShown: tipsLastShown ? (isNaN(tipsLastShown.getTime()) ? 'Invalid Date' : tipsLastShown.toISOString()) : 'null',
+        currentTipSet,
+        calculatedSetId: setId,
+        tipsCount: tips.length
+      });
+      
+      // Always update the UI with the calculated set
       setCurrentTips(tips);
       setCurrentTipSetId(setId);
       setTipsLastUpdated(tipsLastShown);
       
-      // If tips need to be updated (24+ hours passed), update user data
+      // If tips need to be updated (new day), update user data
       const now = new Date();
       if (tipsLastShown) {
-        const timeDiff = now.getTime() - tipsLastShown.getTime();
-        const hoursDiff = timeDiff / (1000 * 60 * 60);
+        // Calculate days since start
+        const startDate = new Date(tipsLastShown);
+        const currentDate = new Date(now);
         
-        if (hoursDiff >= 24) {
+        // Check for invalid dates
+        if (isNaN(startDate.getTime()) || isNaN(currentDate.getTime())) {
+          console.log('⚠️ Invalid date detected, skipping update');
+          return;
+        }
+        
+        // Set both dates to midnight for accurate day calculation
+        startDate.setHours(0, 0, 0, 0);
+        currentDate.setHours(0, 0, 0, 0);
+        
+        const timeDiff = currentDate.getTime() - startDate.getTime();
+        const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+        
+        console.log('🔍 TIME DEBUG:', {
+          startDate: isNaN(startDate.getTime()) ? 'Invalid Date' : startDate.toISOString(),
+          currentDate: isNaN(currentDate.getTime()) ? 'Invalid Date' : currentDate.toISOString(),
+          daysDiff,
+          currentSet: currentTipSet,
+          newSet: setId,
+          needsUpdate: setId !== currentTipSet
+        });
+        
+        // If the calculated set is different from stored set, update it
+        if (setId !== currentTipSet) {
+          console.log('🔄 Updating tips to set:', setId, '(Day', daysDiff + 1, ')');
           updateUserTips(setId, now);
         }
       } else {
-        // First time user, set initial tips
+        // First time user, set initial tips (Day 1 = Set 1)
+        console.log('🔄 Setting initial tips to set:', setId, '(Day 1)');
         updateUserTips(setId, now);
       }
     }
@@ -139,8 +174,42 @@ export default function DashboardPage() {
       });
       
       console.log(`✅ Updated user tips to set ${setId}`);
+      
+      // Refresh user data to get the updated tips
+      await refreshUserData();
     } catch (error) {
       console.error('❌ Error updating user tips:', error);
+    }
+  };
+
+  // Manual function to force refresh tips (for testing)
+  const forceRefreshTips = async () => {
+    if (!user?.uid) return;
+    
+    try {
+      const now = new Date();
+      // Calculate what set should be shown based on current day
+      const { setId, tips } = getCurrentTipSet(userData?.tipsLastShown ? new Date(userData.tipsLastShown) : null, userData?.currentTipSet || 1);
+      
+      console.log('🔄 Force refreshing tips to set:', setId);
+      
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        currentTipSet: setId,
+        tipsLastShown: userData?.tipsLastShown || now // Keep original start date
+      });
+      
+      // Update UI immediately
+      setCurrentTips(tips);
+      setCurrentTipSetId(setId);
+      setTipsLastUpdated(userData?.tipsLastShown ? new Date(userData.tipsLastShown) : now);
+      
+      console.log(`✅ Force refreshed tips to set ${setId}`);
+      
+      // Refresh user data to sync
+      await refreshUserData();
+    } catch (error) {
+      console.error('❌ Error force refreshing tips:', error);
     }
   };
 
@@ -534,7 +603,25 @@ export default function DashboardPage() {
               {/* Viral Secrets - Keep your existing classes, add mobile padding */}
               <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
-                  <h3 className="text-lg sm:text-lg font-semibold text-white">Viral Secrets</h3>
+                  <div className="flex items-center space-x-3">
+                    <h3 className="text-lg sm:text-lg font-semibold text-white">Viral Secrets</h3>
+                    <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+                      Day {(() => {
+                        if (!userData?.tipsLastShown) return 1;
+                        const startDate = new Date(userData.tipsLastShown);
+                        if (isNaN(startDate.getTime())) return 1;
+                        const daysDiff = Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                        return Math.max(1, daysDiff + 1);
+                      })()} - Set {currentTipSetId}
+                    </span>
+                    {/* Debug button - remove this after testing */}
+                    <button
+                      onClick={forceRefreshTips}
+                      className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
+                    >
+                      Refresh Tips
+                    </button>
+                  </div>
                   {!isPremium && (
                     <span className="text-sm sm:text-sm text-gray-400">
                       Unlock all secrets with Premium

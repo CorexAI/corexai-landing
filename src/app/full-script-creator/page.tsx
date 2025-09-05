@@ -343,7 +343,7 @@ export default function FullScriptCreatorPage() {
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     placeholder="Describe your content idea in detail... What story, tutorial, or insight do you want to share? Include key points, emotions, and the message you want to convey."
-                    className="relative w-full h-39 md:h-48 px-6 py-5 bg-gray-900/90 border-2 border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/60 focus:ring-4 focus:ring-purple-500/10 transition-all duration-300 resize-none text-xl leading-relaxed font-medium shadow-2xl shadow-black/20 hover:shadow-2xl hover:shadow-purple-500/10"
+                    className="relative w-full h-39 md:h-48 px-6 py-5 bg-gray-900/90 border-2 border-gray-700/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:border-purple-500/60 focus:ring-4 focus:ring-purple-500/10 transition-all duration-300 resize-none text-base md:text-xl leading-relaxed font-medium shadow-2xl shadow-black/20 hover:shadow-2xl hover:shadow-purple-500/10"
                   />
                 </div>
 
@@ -713,7 +713,7 @@ export default function FullScriptCreatorPage() {
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/15 via-purple-500/15 to-purple-500/15 rounded-2xl blur-sm pointer-events-none"></div>
                     <div className="relative bg-gray-900/90 border-2 border-gray-700/50 rounded-2xl p-6 text-white shadow-2xl shadow-black/20 hover:shadow-2xl hover:shadow-purple-500/10">
-                      <div className="text-xl font-sans leading-relaxed whitespace-pre-wrap break-words">
+                      <div className="text-base md:text-xl font-sans leading-relaxed whitespace-pre-wrap break-words">
                         {generatedScript}
                       </div>
                     </div>
