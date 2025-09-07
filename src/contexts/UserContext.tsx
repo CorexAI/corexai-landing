@@ -149,10 +149,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    window.addEventListener('triggerUsageReset', handleUsageReset as EventListener);
+    window.addEventListener('triggerUsageReset', handleUsageReset as unknown as EventListener);
     
     return () => {
-      window.removeEventListener('triggerUsageReset', handleUsageReset as EventListener);
+      window.removeEventListener('triggerUsageReset', handleUsageReset as unknown as EventListener);
     };
   }, [user]);
 
