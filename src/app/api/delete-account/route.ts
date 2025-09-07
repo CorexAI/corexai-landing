@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
-import { getPaddleClient } from '@/lib/paddle';
 
 // Delete user account completely
 export async function POST(request: NextRequest) {
@@ -16,6 +15,12 @@ export async function POST(request: NextRequest) {
 
     const idToken = authHeader.split('Bearer ')[1];
     
+    // Check if Firebase Admin is available
+    if (!adminAuth || !adminDb) {
+      console.error('❌ Firebase Admin not available');
+      return NextResponse.json({ error: 'Firebase Admin not available' }, { status: 500 });
+    }
+
     // Verify the Firebase ID token
     let decodedToken;
     try {
@@ -44,23 +49,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to retrieve user data' }, { status: 500 });
     }
 
-    // Step 1: Cancel Paddle subscription if user has one
+    // Step 1: Log subscription cancellation (manual process)
     if (userData?.subscriptionId) {
-      try {
-        console.log('🔄 Cancelling Paddle subscription:', userData.subscriptionId);
-        const paddle = getPaddleClient();
-        
-        // Cancel the subscription
-        await paddle.subscriptions.cancel(userData.subscriptionId, {
-          effectiveFrom: 'next_billing_period'
-        });
-        
-        console.log('✅ Paddle subscription cancelled successfully');
-      } catch (error) {
-        console.error('⚠️ Warning: Failed to cancel Paddle subscription:', error);
-        // Continue with deletion even if subscription cancellation fails
-        // The subscription will eventually expire
-      }
+      console.log('📝 User has active subscription:', userData.subscriptionId);
+      console.log('⚠️ Note: Subscription cancellation should be handled manually via Paddle dashboard');
+      // Note: In production, you would integrate with Paddle API here
+      // For now, we'll log the subscription ID for manual cancellation
     }
 
     // Step 2: Delete user document from Firestore

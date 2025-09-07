@@ -15,6 +15,12 @@ export async function POST(request: NextRequest) {
 
     const idToken = authHeader.split('Bearer ')[1];
     
+    // Check if Firebase Admin is available
+    if (!adminAuth || !adminDb) {
+      console.error('❌ Firebase Admin not available');
+      return NextResponse.json({ error: 'Firebase Admin not available' }, { status: 500 });
+    }
+    
     // Verify the Firebase ID token
     let decodedToken;
     try {
