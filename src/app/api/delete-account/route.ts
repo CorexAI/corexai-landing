@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import * as adminServer from '@/lib/firebase-admin';
+import type { Auth } from 'firebase-admin/auth';
+import type { Firestore } from 'firebase-admin/firestore';
+
+const adminAuth = adminServer.adminAuth as Auth | null;
+const adminDb = adminServer.adminDb as Firestore | null;
 
 // Delete user account completely
 export async function POST(request: NextRequest) {
@@ -78,8 +83,12 @@ export async function POST(request: NextRequest) {
       // we should try to restore the Firestore document
       try {
         console.log('🔄 Attempting to restore user document due to Auth deletion failure...');
-        await adminDb.collection('users').doc(userId).set(userData);
-        console.log('✅ User document restored');
+        if (userData) {
+          await adminDb.collection('users').doc(userId).set(userData);
+          console.log('✅ User document restored');
+        } else {
+          console.warn('⚠️ Skipping restore: no userData available to write back');
+        }
       } catch (restoreError) {
         console.error('❌ Failed to restore user document:', restoreError);
       }

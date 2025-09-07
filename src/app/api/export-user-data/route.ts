@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import * as adminServer from '@/lib/firebase-admin';
+import type { Auth } from 'firebase-admin/auth';
+import type { Firestore } from 'firebase-admin/firestore';
+
+const adminAuth = adminServer.adminAuth as Auth | null;
+const adminDb = adminServer.adminDb as Firestore | null;
 
 // Export user data for download before account deletion
 export async function POST(request: NextRequest) {
