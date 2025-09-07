@@ -605,22 +605,6 @@ export default function DashboardPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
                   <div className="flex items-center space-x-3">
                     <h3 className="text-lg sm:text-lg font-semibold text-white">Viral Secrets</h3>
-                    <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
-                      Day {(() => {
-                        if (!userData?.tipsLastShown) return 1;
-                        const startDate = new Date(userData.tipsLastShown);
-                        if (isNaN(startDate.getTime())) return 1;
-                        const daysDiff = Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-                        return Math.max(1, daysDiff + 1);
-                      })()} - Set {currentTipSetId}
-                    </span>
-                    {/* Debug button - remove this after testing */}
-                    <button
-                      onClick={forceRefreshTips}
-                      className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
-                    >
-                      Refresh Tips
-                    </button>
                   </div>
                   {!isPremium && (
                     <span className="text-sm sm:text-sm text-gray-400">
