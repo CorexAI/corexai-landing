@@ -6,6 +6,7 @@ import { openPaddleCheckout } from "@/lib/paddle";
 import { useState } from "react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/contexts/ToastContext";
+import { trackEvent } from "@/lib/gtag";
 
 export default function PaymentPage() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -20,6 +21,8 @@ export default function PaymentPage() {
     }
     
     setIsProcessing(true);
+    trackEvent('plan_selected', { plan: 'pro', location: 'payment' });
+    trackEvent('checkout_opened', { provider: 'paddle', plan: 'pro' });
     openPaddleCheckout('pro');
     // Reset after a short delay
     setTimeout(() => setIsProcessing(false), 2000);
@@ -33,6 +36,8 @@ export default function PaymentPage() {
     }
     
     setIsProcessing(true);
+    trackEvent('plan_selected', { plan: 'creator', location: 'payment' });
+    trackEvent('checkout_opened', { provider: 'paddle', plan: 'creator' });
     openPaddleCheckout('creator');
     // Reset after a short delay
     setTimeout(() => setIsProcessing(false), 2000);
@@ -406,7 +411,7 @@ export default function PaymentPage() {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={() => { trackEvent('payment_skip_clicked', { location: 'payment' }); window.location.href = '/dashboard'; }}
             className="group relative bg-gray-900/50 hover:bg-gray-800/60 border border-gray-700/50 hover:border-gray-600/60 text-gray-300 hover:text-white px-8 py-3 rounded-xl text-lg font-medium transition-all duration-300 backdrop-blur-sm hover:shadow-lg hover:shadow-gray-500/10"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-gray-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out rounded-xl"></div>

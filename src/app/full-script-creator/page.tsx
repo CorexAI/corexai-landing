@@ -11,6 +11,7 @@ import { useToast } from '@/contexts/ToastContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import AppSidebar from '@/components/AppSidebar';
+import { trackEvent } from '@/lib/gtag';
 
 export default function FullScriptCreatorPage() {
   const { user, userData, loading: userLoading, refreshUserData } = useUser();
@@ -183,6 +184,7 @@ export default function FullScriptCreatorPage() {
     try {
       await navigator.clipboard.writeText(generatedScript);
       showSuccess('Copied!', 'Script copied to clipboard successfully.');
+      trackEvent('copy_clicked', { location: 'full-script-creator', type: 'script' });
     } catch (error) {
       console.error('❌ Failed to copy:', error);
       
@@ -195,6 +197,7 @@ export default function FullScriptCreatorPage() {
       try {
         document.execCommand('copy');
         showSuccess('Copied!', 'Script copied to clipboard successfully.');
+        trackEvent('copy_clicked', { location: 'full-script-creator', type: 'script' });
       } catch (fallbackError) {
         console.error('❌ Fallback copy failed:', fallbackError);
         showError('Copy Failed', 'Failed to copy text. Please select and copy manually.');
@@ -223,6 +226,7 @@ export default function FullScriptCreatorPage() {
         platform: platform
       });
       showSuccess('PDF Generated!', 'Your script has been downloaded as a PDF.');
+      trackEvent('download_pdf_clicked', { location: 'full-script-creator', type: 'script' });
     } catch (error) {
       console.error('❌ Error generating PDF:', error);
       showError('PDF Generation Failed', 'Failed to generate PDF. Please try again.');
@@ -370,6 +374,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setScriptLength('30s');
                               setShowLengthDropdown(false);
+                              trackEvent('length_selected', { location: 'full-script-creator', value: '30s' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-t-lg"
                           >
@@ -379,6 +384,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setScriptLength('60s');
                               setShowLengthDropdown(false);
+                              trackEvent('length_selected', { location: 'full-script-creator', value: '60s' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -389,6 +395,7 @@ export default function FullScriptCreatorPage() {
                               if (userData?.plan === 'creator') {
                                 setScriptLength('90s');
                                 setShowLengthDropdown(false);
+                                trackEvent('length_selected', { location: 'full-script-creator', value: '90s' });
                               }
                             }}
                             onMouseEnter={() => {}}
@@ -426,6 +433,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Casual');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Casual' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-t-lg"
                           >
@@ -435,6 +443,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Professional');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Professional' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -444,6 +453,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Energetic');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Energetic' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -453,6 +463,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Humorous');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Humorous' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -462,6 +473,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Inspirational');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Inspirational' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -471,6 +483,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Storytelling');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Storytelling' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -480,6 +493,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Direct');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Direct' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -489,6 +503,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setTone('Diplomatic');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'full-script-creator', value: 'Diplomatic' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-b-lg"
                           >
@@ -518,6 +533,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('General');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'General' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-t-lg text-sm md:text-base flex items-center"
                           >
@@ -528,6 +544,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('Young Adults');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'Young Adults' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -538,6 +555,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('Professionals');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'Professionals' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -548,6 +566,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('Students');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'Students' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -558,6 +577,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('Entrepreneurs');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'Entrepreneurs' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -568,6 +588,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('Tech Savvy');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'Tech Savvy' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -578,6 +599,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('Fitness');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'Fitness' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -588,6 +610,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setAudience('Marketing');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'full-script-creator', value: 'Marketing' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-b-lg text-sm md:text-base flex items-center"
                           >
@@ -618,6 +641,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setPlatform('TikTok');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'full-script-creator', value: 'TikTok' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-t-lg"
                           >
@@ -627,6 +651,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setPlatform('Instagram');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'full-script-creator', value: 'Instagram' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -636,6 +661,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setPlatform('YouTube');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'full-script-creator', value: 'YouTube' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -645,6 +671,7 @@ export default function FullScriptCreatorPage() {
                             onClick={() => {
                               setPlatform('LinkedIn');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'full-script-creator', value: 'LinkedIn' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-b-lg"
                           >

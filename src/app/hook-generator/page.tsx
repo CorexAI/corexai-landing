@@ -11,6 +11,7 @@ import { useToast } from '@/contexts/ToastContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import AppSidebar from '@/components/AppSidebar';
+import { trackEvent } from '@/lib/gtag';
 
 export default function HookGeneratorPage() {
   const { user, userData, loading: userLoading, refreshUserData } = useUser();
@@ -172,6 +173,7 @@ export default function HookGeneratorPage() {
     try {
       await navigator.clipboard.writeText(generatedHook);
       showSuccess('Copied!', 'Hook copied to clipboard successfully.');
+      trackEvent('copy_clicked', { location: 'hook-generator', type: 'hook' });
     } catch (error) {
       console.error('❌ Failed to copy:', error);
       
@@ -184,6 +186,7 @@ export default function HookGeneratorPage() {
       try {
         document.execCommand('copy');
         showSuccess('Copied!', 'Hook copied to clipboard successfully.');
+        trackEvent('copy_clicked', { location: 'hook-generator', type: 'hook' });
       } catch (fallbackError) {
         console.error('❌ Fallback copy failed:', fallbackError);
         showError('Copy Failed', 'Failed to copy text. Please select and copy manually.');
@@ -211,6 +214,7 @@ export default function HookGeneratorPage() {
         platform: platform
       });
       showSuccess('PDF Generated!', 'Your hook has been downloaded as a PDF.');
+      trackEvent('download_pdf_clicked', { location: 'hook-generator', type: 'hook' });
     } catch (error) {
       console.error('❌ Error generating PDF:', error);
       showError('PDF Generation Failed', 'Failed to generate PDF. Please try again.');
@@ -356,6 +360,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Casual');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Casual' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-t-lg text-sm md:text-base flex items-center"
                           >
@@ -366,6 +371,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Professional');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Professional' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -376,6 +382,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Energetic');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Energetic' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -386,6 +393,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Humorous');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Humorous' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -396,6 +404,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Inspirational');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Inspirational' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -406,6 +415,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Storytelling');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Storytelling' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -416,6 +426,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Direct');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Direct' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -426,6 +437,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setTone('Diplomatic');
                               setShowToneDropdown(false);
+                              trackEvent('tone_selected', { location: 'hook-generator', value: 'Diplomatic' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-b-lg text-sm md:text-base flex items-center"
                           >
@@ -456,6 +468,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('General');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'General' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-t-lg text-sm md:text-base flex items-center"
                           >
@@ -466,6 +479,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('Young Adults');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'Young Adults' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -476,6 +490,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('Professionals');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'Professionals' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -486,6 +501,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('Students');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'Students' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -496,6 +512,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('Entrepreneurs');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'Entrepreneurs' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -506,6 +523,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('Tech Savvy');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'Tech Savvy' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -516,6 +534,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('Fitness');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'Fitness' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors text-sm md:text-base flex items-center"
                           >
@@ -526,6 +545,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setAudience('Marketing');
                               setShowAudienceDropdown(false);
+                              trackEvent('audience_selected', { location: 'hook-generator', value: 'Marketing' });
                             }}
                             className="w-full px-3 md:px-4 py-2 md:py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-b-lg text-sm md:text-base flex items-center"
                           >
@@ -556,6 +576,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setPlatform('TikTok');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'hook-generator', value: 'TikTok' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-t-lg"
                           >
@@ -565,6 +586,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setPlatform('Instagram');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'hook-generator', value: 'Instagram' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -574,6 +596,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setPlatform('YouTube');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'hook-generator', value: 'YouTube' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors"
                           >
@@ -583,6 +606,7 @@ export default function HookGeneratorPage() {
                             onClick={() => {
                               setPlatform('LinkedIn');
                               setShowPlatformDropdown(false);
+                              trackEvent('platform_selected', { location: 'hook-generator', value: 'LinkedIn' });
                             }}
                             className="w-full px-4 py-3 text-left text-white hover:bg-gray-700 transition-colors rounded-b-lg"
                           >
