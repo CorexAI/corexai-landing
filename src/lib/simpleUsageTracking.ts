@@ -25,7 +25,7 @@ export const incrementUsage = async (uid: string, type: 'hook' | 'script') => {
         plan: 'free',
         lastReset: new Date(),
         verified: false,
-        onboardingCompleted: false
+        onboardingCompleted: true
       };
       
       await setDoc(userRef, newUserData);

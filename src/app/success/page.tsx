@@ -5,49 +5,94 @@ import { FiCheck, FiArrowRight, FiHome, FiUser } from "react-icons/fi";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/contexts/ToastContext";
+import { db } from "@/lib/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
 function SuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, userData, loading: userLoading } = useUser();
-  const { showSuccess } = useToast();
+  const { showSuccess, showError } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [isWaitingForUpdate, setIsWaitingForUpdate] = useState(true);
+  const [currentPlan, setCurrentPlan] = useState<string>('free');
+  const [hasShownSuccess, setHasShownSuccess] = useState(false);
 
+  // Real-time listener for plan updates
   useEffect(() => {
-    const checkSubscription = async () => {
-      try {
-        // Wait a moment for webhook to process
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        
-        // Refresh user data to get updated subscription status
-        if (user) {
-          // Force refresh user data from Firebase
-          try {
-            // You might need to implement a refresh function in UserContext
-            // For now, we'll show success message based on URL params or user data
-            const plan = userData?.plan || 'pro'; // Default to pro if unknown
-            const planName = plan === 'creator' ? 'Creator' : 'Pro';
-            showSuccess(`🎉 Welcome to Corex AI ${planName}!`, "Your subscription has been activated successfully!");
-          } catch (refreshError) {
-            console.warn('Could not refresh user data:', refreshError);
-            // Still show success message
-            showSuccess("🎉 Welcome to Corex AI Pro!", "Your subscription has been activated successfully!");
-          }
-        }
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error checking subscription:', error);
-        setIsLoading(false);
-        // Show success message even if there's an error
-        const plan = userData?.plan || 'pro';
-        const planName = plan === 'creator' ? 'Creator' : 'Pro';
-        showSuccess(`🎉 Welcome to Corex AI ${planName}!`, "Your subscription has been activated successfully!");
-      }
-    };
+    if (!user?.uid || !db) {
+      console.log('No user or db available, skipping real-time listener');
+      return;
+    }
 
-    checkSubscription();
-  }, [user, showSuccess]);
+    console.log('Setting up real-time listener for user:', user.uid);
+    
+    const unsubscribe = onSnapshot(
+      doc(db, 'users', user.uid),
+      (doc) => {
+        if (doc.exists()) {
+          const newData = doc.data();
+          const newPlan = newData.plan || 'free';
+          console.log('Real-time update received - Plan:', newPlan);
+          
+          setCurrentPlan(newPlan);
+          
+          // If plan is no longer free, subscription was successful
+          if (newPlan !== 'free' && !hasShownSuccess) {
+            console.log('Subscription activated! Plan:', newPlan);
+            setIsWaitingForUpdate(false);
+            setHasShownSuccess(true);
+            
+            const planName = newPlan === 'creator' ? 'Creator' : 'Pro';
+            showSuccess(`🎉 Welcome to Corex AI ${planName}!`, "Your subscription has been activated successfully!");
+            
+            // Auto-redirect to dashboard after showing success
+            setTimeout(() => {
+              router.push('/dashboard');
+            }, 3000);
+          }
+        } else {
+          console.log('User document not found');
+        }
+      },
+      (error) => {
+        console.error('Real-time listener error:', error);
+        // Don't show error to user, just log it
+      }
+    );
+
+    // Timeout after 30 seconds (fallback)
+    const timeout = setTimeout(() => {
+      if (isWaitingForUpdate) {
+        console.log('Timeout reached, stopping wait for update');
+        setIsWaitingForUpdate(false);
+        setIsLoading(false);
+        showError('Update Timeout', 'Please refresh the page to see your updated plan.');
+      }
+    }, 30000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
+  }, [user?.uid, hasShownSuccess, showSuccess, showError, router]);
+
+  // Handle case where user already has a paid plan
+  useEffect(() => {
+    if (userData?.plan && userData.plan !== 'free' && !hasShownSuccess) {
+      console.log('User already has paid plan:', userData.plan);
+      setIsWaitingForUpdate(false);
+      setIsLoading(false);
+      setHasShownSuccess(true);
+      
+      const planName = userData.plan === 'creator' ? 'Creator' : 'Pro';
+      showSuccess(`🎉 Welcome to Corex AI ${planName}!`, "Your subscription is already active!");
+      
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 3000);
+    }
+  }, [userData?.plan, hasShownSuccess, showSuccess, router]);
 
   const handleGoToDashboard = () => {
     router.push('/dashboard');
@@ -57,12 +102,24 @@ function SuccessPageContent() {
     router.push('/');
   };
 
-  if (isLoading) {
+  // Show loading state while waiting for plan update
+  if (isLoading || isWaitingForUpdate) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-300">Setting up your subscription...</p>
+          <p className="text-gray-300 text-lg font-medium">Activating your subscription...</p>
+          <p className="text-gray-400 text-sm mt-2">This may take a few moments</p>
+          
+          {/* Progress indicator */}
+          <div className="w-64 bg-gray-700 rounded-full h-2 mt-6 mx-auto">
+            <div className="bg-blue-500 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+          </div>
+          
+          {/* Current plan status */}
+          <p className="text-gray-500 text-xs mt-4">
+            Current plan: {currentPlan === 'free' ? 'Free' : currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
+          </p>
         </div>
       </div>
     );
@@ -118,9 +175,25 @@ function SuccessPageContent() {
             className="text-xl text-gray-300 mb-8 leading-relaxed"
           >
             Welcome to Corex AI! Your subscription has been activated and you now have access to unlimited content creation tools.
-            {userData?.plan === 'pro' && ' Enjoy unlimited hooks and 50 scripts per month!'}
-            {userData?.plan === 'creator' && ' Enjoy unlimited hooks and unlimited scripts!'}
+            {currentPlan === 'pro' && ' Enjoy unlimited hooks and 50 scripts per month!'}
+            {currentPlan === 'creator' && ' Enjoy unlimited hooks and unlimited scripts!'}
           </motion.p>
+
+          {/* Success confirmation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
+            className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-8"
+          >
+            <div className="flex items-center gap-3">
+              <FiCheck className="text-green-400 text-xl" />
+              <div>
+                <p className="text-green-400 font-medium">Subscription Activated!</p>
+                <p className="text-green-300/80 text-sm">You now have {currentPlan === 'creator' ? 'Creator' : 'Pro'} access</p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Action Buttons */}
           <motion.div

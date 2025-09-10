@@ -10,7 +10,11 @@ import {
   sendPasswordResetEmail,
   sendEmailVerification,
   EmailAuthProvider,
-  reauthenticateWithCredential
+  reauthenticateWithCredential,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from 'firebase/auth';
 import { doc, setDoc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -47,6 +51,7 @@ interface AuthContextType {
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<{ isNewUser: boolean }>;
   signOutUser: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   sendVerificationEmail: () => Promise<void>;
@@ -179,7 +184,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         scriptsGenerated: 0,
         lastReset: new Date(),
         verified: false,
-        onboardingCompleted: false,
+        onboardingCompleted: true,
         timezone: timezone
       };
 
@@ -204,6 +209,65 @@ export function UserProvider({ children }: { children: ReactNode }) {
     } catch (error: any) {
       console.error('🔐 UserContext - signInWithEmailAndPassword failed:', error);
       // Pass the original error object to preserve error codes
+      throw error;
+    }
+  };
+
+  // Sign in or sign up with Google
+  const signInWithGoogle = async (): Promise<{ isNewUser: boolean }> => {
+    if (!auth || !db) throw new Error('Firebase not initialized');
+
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      let userCredential;
+      try {
+        // Prefer popup where available
+        userCredential = await signInWithPopup(auth, provider);
+      } catch (popupError: any) {
+        // Fallback for environments that block popups (e.g., mobile Safari)
+        await signInWithRedirect(auth, provider);
+        const redirectResult = await getRedirectResult(auth);
+        if (!redirectResult) {
+          throw popupError;
+        }
+        userCredential = redirectResult;
+      }
+
+      const firebaseUser = userCredential.user;
+
+      // Check if user document exists
+      const userRef = doc(db, 'users', firebaseUser.uid);
+      const userDoc = await getDoc(userRef);
+
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      if (!userDoc.exists()) {
+        // Create a new user document for first-time Google sign-in
+        const newUserData: UserData = {
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName || '',
+          email: firebaseUser.email || '',
+          plan: 'free',
+          hooksGenerated: 0,
+          scriptsGenerated: 0,
+          lastReset: new Date(),
+          verified: true,
+          onboardingCompleted: true,
+          timezone
+        };
+
+        await setDoc(userRef, newUserData);
+        setUserData(newUserData);
+        return { isNewUser: true };
+      } else {
+        const data = userDoc.data() as UserData;
+        setUserData(data);
+        return { isNewUser: false };
+      }
+    } catch (error: any) {
+      // Surface original error for UI to map to friendly message
       throw error;
     }
   };
@@ -392,6 +456,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOutUser,
     resetPassword,
     sendVerificationEmail,

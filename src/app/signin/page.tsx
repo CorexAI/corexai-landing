@@ -1,6 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
+import { FcGoogle } from "react-icons/fc";
+import { useToast } from "@/contexts/ToastContext";
+import { trackEvent } from "@/lib/gtag";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,8 +13,9 @@ import { getErrorMessage } from "@/utils/errorMessages";
 import ErrorHelper from "@/components/ErrorHelper";
 
 export default function SignInPage() {
-  const { signIn, user, loading } = useUser();
+  const { signIn, signInWithGoogle, user, loading } = useUser();
   const router = useRouter();
+  const { showError, showInfo, showSuccess } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,11 +52,14 @@ export default function SignInPage() {
     setError("");
 
     try {
+      trackEvent('email_signin_attempt');
       console.log('🔄 Starting sign in process...');
       console.log('📧 Email:', email);
       console.log('🔑 Password length:', password.length);
       
       const result = await signIn(email, password);
+      trackEvent('email_signin_success');
+      showSuccess('Signed in', 'Welcome back!');
       console.log('✅ Sign in successful, result:', result);
       console.log('✅ Sign in successful, waiting for auth state sync...');
       // The redirect will be handled by the useEffect above
@@ -70,6 +77,34 @@ export default function SignInPage() {
       }
       
       setError(getErrorMessage(error));
+      trackEvent('email_signin_error', { code: error?.code });
+      showError('Sign in failed', getErrorMessage(error));
+      setIsSigningIn(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    if (isSigningIn) return;
+    setIsSigningIn(true);
+    setError("");
+    try {
+      showInfo('Opening Google', 'Please select your Google account');
+      trackEvent('google_signin_click');
+      await signInWithGoogle();
+      trackEvent('google_signin_success');
+      showSuccess('Signed in with Google', 'Welcome back!');
+      // Redirect handled by useEffect after auth state sync
+    } catch (error: any) {
+      setError(getErrorMessage(error));
+      trackEvent('google_signin_error', { code: error?.code });
+      const code = error?.code || '';
+      if (code.includes('popup-blocked')) {
+        showError('Popup blocked', 'Your browser blocked the popup. We will try redirect next time.');
+      } else if (code.includes('popup-closed-by-user')) {
+        showError('Popup closed', 'The Google popup was closed before completing sign in.');
+      } else {
+        showError('Google sign in failed', getErrorMessage(error));
+      }
       setIsSigningIn(false);
     }
   };
@@ -129,6 +164,23 @@ export default function SignInPage() {
               >
                 Generate viral scripts and hooks instantly
               </motion.p>
+            </div>
+
+            {/* Social Auth */}
+            <div className="mb-6">
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 hover:bg-gray-100 active:bg-gray-200 px-4 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                <FcGoogle className="w-5 h-5" />
+                Continue with Google
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px bg-white/10 w-full" />
+              <span className="text-gray-400 text-sm">or</span>
+              <div className="h-px bg-white/10 w-full" />
             </div>
 
             {/* Sign In Form */}
