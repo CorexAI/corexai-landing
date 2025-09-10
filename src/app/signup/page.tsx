@@ -1,6 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeOff, HiOutlineUser } from "react-icons/hi";
+import { FcGoogle } from "react-icons/fc";
+import { useToast } from "@/contexts/ToastContext";
+import { trackEvent } from "@/lib/gtag";
 import Link from "next/link";
 import { useState } from "react";
 import Footer from "../components/Footer";
@@ -11,8 +14,9 @@ import { getErrorMessage } from "@/utils/errorMessages";
 import ErrorHelper from "@/components/ErrorHelper";
 
 export default function SignUpPage() {
-  const { signUp } = useUser();
+  const { signUp, signInWithGoogle } = useUser();
   const router = useRouter();
+  const { showError, showInfo, showSuccess } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,6 +44,7 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
+      trackEvent('email_signup_attempt');
       // Validate password
       const passwordValidation = validatePassword(password);
       if (!passwordValidation.isValid) {
@@ -57,11 +62,44 @@ export default function SignUpPage() {
 
       // Sign up user
       await signUp(email, password, name);
+      trackEvent('email_signup_success');
+      showSuccess('Account created', 'Welcome to Corex AI!');
       
-      // Redirect to onboarding
-      router.push('/onboarding');
+      // Redirect to payment
+      router.push('/payment');
     } catch (error: any) {
       setError(getErrorMessage(error));
+      trackEvent('email_signup_error', { code: error?.code });
+      showError('Sign up failed', getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    if (loading) return;
+    setError("");
+    setLoading(true);
+    try {
+      showInfo('Opening Google', 'Please select your Google account');
+      trackEvent('google_signup_click');
+      const { isNewUser } = await signInWithGoogle();
+      trackEvent('google_signup_success', { isNewUser });
+      showSuccess('Signed in with Google', isNewUser ? 'Welcome to Corex AI!' : 'Welcome back!');
+      // New users go to payment; returning users also see payment once after signup page intent
+      router.push('/payment');
+    } catch (error: any) {
+      setError(getErrorMessage(error));
+      trackEvent('google_signup_error', { code: error?.code });
+      // Special friendly messages
+      const code = error?.code || '';
+      if (code.includes('popup-blocked')) {
+        showError('Popup blocked', 'Your browser blocked the popup. We will try redirect next time.');
+      } else if (code.includes('popup-closed-by-user')) {
+        showError('Popup closed', 'The Google popup was closed before completing sign in.');
+      } else {
+        showError('Google sign in failed', getErrorMessage(error));
+      }
     } finally {
       setLoading(false);
     }
@@ -122,6 +160,23 @@ export default function SignUpPage() {
               >
                 Start generating viral scripts and hooks instantly
               </motion.p>
+            </div>
+
+            {/* Social Auth */}
+            <div className="mb-6">
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 hover:bg-gray-100 active:bg-gray-200 px-4 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                <FcGoogle className="w-5 h-5" />
+                Continue with Google
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px bg-white/10 w-full" />
+              <span className="text-gray-400 text-sm">or</span>
+              <div className="h-px bg-white/10 w-full" />
             </div>
 
             {/* Sign Up Form */}

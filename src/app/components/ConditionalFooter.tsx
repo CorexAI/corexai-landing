@@ -16,9 +16,7 @@ export default function ConditionalFooter() {
                           pathname?.startsWith('/hook-generator') ||
                           pathname === '/hook-generator' ||
                           pathname?.startsWith('/full-script-creator') ||
-                          pathname === '/full-script-creator' ||
-                          pathname?.startsWith('/onboarding') ||
-                          pathname === '/onboarding';
+                          pathname === '/full-script-creator';
 
   if (shouldHideFooter) {
     return null;

@@ -113,7 +113,7 @@ export const incrementUsage = async (uid: string, type: 'hook' | 'script', amoun
           plan: 'free',
           lastReset: new Date(),
           verified: false,
-          onboardingCompleted: false
+          onboardingCompleted: true
         };
         
         transaction.set(userRef, newUserData);

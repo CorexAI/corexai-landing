@@ -7,8 +7,7 @@ const protectedRoutes = [
   '/full-script-creator',
   '/dashboard',
   '/billing',
-  '/payment',
-  '/onboarding'
+  '/payment'
 ];
 
 // This function can be marked `async` if using `await` inside
