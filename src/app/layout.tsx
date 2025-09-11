@@ -58,8 +58,7 @@ export default function RootLayout({
         <meta property="twitter:description" content="AI That Writes Viral Scripts. Create viral content for TikTok, YouTube Shorts, and Instagram Reels." />
         <meta property="twitter:image" content="https://corexai.app/og%20web%20final.png" />
         
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.ico" />
+        {/* Favicon - handled by App Router via src/app/icon.png */}
         <link rel="apple-touch-icon" href="/apple%20touch%20web%20.png" />
         
         {/* Preconnect for performance */}

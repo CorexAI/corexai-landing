@@ -45,6 +45,7 @@ Rules :
 - Scene 3 (Escalation/Climax): 20–24 words. Energy rises, drop tension or twist. (~10s)
 - Scene 4 (CTA/Outro): 10–14 words. Direct, punchy, emotional CTA. (~7s)
 - CRITICAL: NEVER use ** (asterisks) anywhere in the output
+- Always detect the input language and respond in the exact same language. Never switch to English unless the user explicitly asks.
 - CRITICAL: NEVER use emojis anywhere in the output
 - CRITICAL: Output format must be exactly as shown below with NO asterisks
 - OUTPUT FORMAT (NO ASTERISKS):
@@ -56,7 +57,7 @@ Scene 2:
 Voice: Add quick emotional/context line. Make viewer FEEL why it matters.
 B-Roll:  Add B-Roll which is easily shootable from phone, based on ${topic}, based on actor.
 Scene 3:
-Voice: Push tension higher — "Here's the crazy part…" (keep it short).
+Voice: Push tension higher — about ${topic},(keep it short).
 B-Roll: Use dynamic footage: zooms, graphs rising, chaos visuals, or symbolic clips.
 Scene 4: CTA:
 Voice: Deliver punchline, twist, or call-to-action (must feel inevitable).
@@ -76,6 +77,7 @@ REMEMBER: NO ASTERISKS (**) ANYWHERE IN THE OUTPUT!`;
 7. CRITICAL: NEVER use ** (asterisks) anywhere in the output
 8. CRITICAL: NEVER use emojis anywhere in the output
 9. CRITICAL: Output format must be exactly as shown below with NO asterisks
+10. Always detect the input language and respond in the exact same language. Never switch to English unless the user explicitly asks.
 
 --- OUTPUT FORMAT (NO ASTERISKS) --- 
 
@@ -89,10 +91,10 @@ Scene 3:
 Voice: Highlight problem/stakes rising for ${audience}. (~15 words) 
 B-Roll: Fast cuts, chaos or tension visuals. 
 Scene 4:
-Voice: Mini-twist or reveal to spark urgency. (~15 words) 
+Voice: fast paced - continue the story for ${topic} (~15 words) 
 B-Roll: must be phone shootable, single actor. according to the ${topic} 
 Scene 5:
-Voice: Push escalation — "here's the crazy part" about ${topic}. (~15 words) 
+Voice: Push escalation — about ${topic}. (~15 words) 
 B-Roll: Quick-cut sequences, symbolic visuals. 
 Scene 6:
 Voice: Climax — solution or insight for ${audience} on ${platform}. (~15 words) 
@@ -115,6 +117,7 @@ RULES :
 - CRITICAL: NEVER use ** (asterisks) anywhere in the output
 - CRITICAL: NEVER use emojis anywhere in the output
 - CRITICAL: Output format must be exactly as shown below with NO asterisks
+ - Always detect the input language and respond in the exact same language. Never switch to English unless the user explicitly asks.
 
 OUTPUT FORMAT (NO ASTERISKS):
 
@@ -130,7 +133,7 @@ Scene 4:
 Voice: Drop a counterintuitive fact about ${topic} to spark urgency,
 B-Roll: Quick phone-shot transition, single actor, aligns with ${topic}.
 Scene 5:
-Voice: Amp up: "Here's the game-changer for ${topic}!"
+Voice: fast-paced - continue the story for ${topic}!
 B-Roll: Fast-paced, symbolic phone-shot cuts, matches ${tone}.
 Scene 6:
 Voice: Hit with a surprising stat or angle on ${topic}
