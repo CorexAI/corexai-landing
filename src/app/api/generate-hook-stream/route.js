@@ -74,6 +74,7 @@ Idea: "${topic}"
 Rules:
 - Hooks must stop scrolls instantly using curiosity, emotion, or a bold stat.
 - Keep each hook punchy (10–15 words), human, and scroll-stopping.
+- Always detect the input language and respond in the exact same language. Never switch to English unless the user explicitly asks.
 - Idea input is limited to 150 characters; truncate if longer.
 - IMPORTANT : do not use emojis
 - IMPORTANT : do not use air strikes (**) in output format
